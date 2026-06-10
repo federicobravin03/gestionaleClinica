@@ -1,10 +1,17 @@
 from models import Paziente
+from sqlalchemy import select
+from fastapi import HTTPException
 
 class PazienteServices:
     def __init__(self, db):
         self.db = db
 
     def crea(self, dati):
+        esistente = self.cercaCodiceFiscale(dati.codiceFiscale)
+        
+        if esistente is not None:
+            raise HTTPException(status_code=409, detail="Il codice fiscale è gia presente")
+        
         nuovoPaziente = Paziente(
             nome = dati.nome,
             cognome = dati.cognome,
@@ -21,3 +28,13 @@ class PazienteServices:
         self.db.refresh(nuovoPaziente)
 
         return nuovoPaziente
+    
+    def leggiTutti(self):
+        query = select(Paziente)
+        risultato = self.db.execute(query).scalars().all()
+        return risultato
+    
+    def cercaCodiceFiscale(self, codiceFiscale):
+        query = select(Paziente).where(Paziente.codiceFiscale == codiceFiscale)
+        risultato = self.db.execute(query).scalar_one_or_none()
+        return risultato
