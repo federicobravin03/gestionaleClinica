@@ -14,3 +14,13 @@ class PazienteOut(BaseModel):
     sesso: Sesso
 
     model_config = {"from_attributes": True}
+
+class PazienteCreate(BaseModel):
+    nome: str
+    cognome: str
+    codiceFiscale: str
+    dataNascita: datetime.date
+    telefono: str
+    email: str | None
+    indirizzo: str
+    sesso: Sesso
