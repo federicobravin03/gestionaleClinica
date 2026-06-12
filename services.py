@@ -38,3 +38,8 @@ class PazienteServices:
         query = select(Paziente).where(Paziente.codiceFiscale == codiceFiscale)
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
+    
+    def cercaId(self, id):
+        query = select(Paziente).where(Paziente.id == id)
+        risultato = self.db.execute(query).scalar_one_or_none()
+        return risultato

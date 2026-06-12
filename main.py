@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from database import Base, engine, get_db
 from sqlalchemy.orm import Session
 from schemas import PazienteOut
@@ -25,3 +25,11 @@ async def creaPazienti(dati: PazienteCreate, db: Session = Depends(get_db)):
     service = PazienteServices(db)
     nuovoPaziente = service.crea(dati)
     return nuovoPaziente
+
+@app.get("/pazienti/{id}", response_model=PazienteOut)
+async def cercaId(id: int, db: Session = Depends(get_db)):
+    service = PazienteServices(db)
+    pazientePerId = service.cercaId(id)
+    if pazientePerId is None:
+        raise HTTPException(status_code=404, detail="Paziente non trovato")
+    return pazientePerId
