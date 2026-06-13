@@ -24,3 +24,12 @@ class PazienteCreate(BaseModel):
     email: str | None
     indirizzo: str
     sesso: Sesso
+
+class PazienteUpdate(BaseModel):
+    nome: str | None = None
+    cognome: str | None = None
+    dataNascita: datetime.date | None = None
+    telefono: str | None = None
+    email: str | None = None
+    indirizzo: str | None = None
+    sesso: Sesso | None = None

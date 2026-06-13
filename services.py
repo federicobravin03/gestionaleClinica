@@ -43,3 +43,28 @@ class PazienteServices:
         query = select(Paziente).where(Paziente.id == id)
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
+    
+    def aggiorna(self, id, dati):
+        paziente = self.cercaId(id)
+
+        if paziente is None:
+            raise HTTPException(status_code=404, detail="Paziente non trovato")
+
+        campiDaAggiornare = dati.model_dump(exclude_unset=True)
+
+        for campo, valore in campiDaAggiornare.items():
+            setattr(paziente, campo, valore)
+
+        self.db.commit()
+        self.db.refresh(paziente)
+        return paziente
+    
+    def elimina(self, id):
+        paziente = self.cercaId(id)
+        
+        if paziente is None:
+            raise HTTPException(status_code=404, detail="Paziente non trovato")
+        
+        self.db.delete(paziente)
+        self.db.commit()
+        return {"message": "Paziente eliminato con successo"}
