@@ -33,3 +33,20 @@ class PazienteUpdate(BaseModel):
     email: str | None = None
     indirizzo: str | None = None
     sesso: Sesso | None = None
+
+class MedicoOut(BaseModel):
+    id: int
+    utente_id: int
+    numeroAlbo: str
+    specializzazione: str
+
+    model_config = {"from_attributes": True}
+
+class MedicoCreate(BaseModel):
+    utente_id: int
+    numeroAlbo: str
+    specializzazione: str
+
+class MedicoUpdate(BaseModel):
+    numeroAlbo: str | None = None
+    specializzazione: str | None = None
