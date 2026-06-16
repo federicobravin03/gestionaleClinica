@@ -1,7 +1,11 @@
 from models import Paziente
 from models import Medico
+from models import Utente
 from sqlalchemy import select
 from fastapi import HTTPException
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class PazienteServices:
     def __init__(self, db):
@@ -131,3 +135,70 @@ class MedicoServices:
         self.db.delete(medico)
         self.db.commit()
         return{"message": "Medico eliminato con successo"}
+    
+class UtenteServices:
+    def __init__(self, db):
+        self.db = db
+    
+    def cercaCodiceFiscale(self, codiceFiscale):
+        query = select(Utente).where(Utente.codiceFiscale == codiceFiscale)
+        risultato = self.db.execute(query).scalar_one_or_none()
+        return risultato
+
+    def crea(self, dati):
+        esistente = self.cercaCodiceFiscale(dati.codiceFiscale)
+
+        if esistente is not None:
+            raise HTTPException(status_code=409, detail="Utente già esistente")
+        
+        nuovoUtente = Utente(
+            nome = dati.nome,
+            cognome = dati.cognome,
+            codiceFiscale = dati.codiceFiscale,
+            ruolo = dati.ruolo,
+            telefono = dati.telefono,
+            email = dati.email,
+            username = dati.username,
+            passwordHash = pwd_context.hash(dati.password)
+        )
+
+        self.db.add(nuovoUtente)
+        self.db.commit()
+        self.db.refresh(nuovoUtente)
+
+        return nuovoUtente
+    
+    def leggiTutti(self):
+        query = select(Utente)
+        risulato = self.db.execute(query).scalars().all()
+        return risulato
+    
+    def cercaId(self, id):
+        query = select(Utente).where(Utente.id == id)
+        risultato = self.db.execute(query).scalar_one_or_none()
+        return risultato
+    
+    def aggiorna(self, id, dati):
+        utente = self.cercaId(id)
+
+        if utente is None:
+            raise HTTPException(status_code=404, detail="Utente non trovato")
+        
+        campiDaAggiornare = dati.model_dump(exclude_unset=True)
+
+        for campo, valore in campiDaAggiornare.items():
+            setattr(utente, campo, valore)
+
+        self.db.commit()
+        self.db.refresh(utente)
+        return utente
+    
+    def elimina(self, id):
+        utente = self.cercaId(id)
+        
+        if utente is None:
+            raise HTTPException(status_code=404, detail="Utente non trovato")
+        
+        self.db.delete(utente)
+        self.db.commit()
+        return{"message": "Utente elimnato con successo"}

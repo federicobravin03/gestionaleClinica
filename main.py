@@ -1,14 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException
 from database import Base, engine, get_db
 from sqlalchemy.orm import Session
-from schemas import PazienteOut
-from schemas import PazienteCreate
-from schemas import PazienteUpdate
-from schemas import MedicoOut
-from schemas import MedicoCreate
-from schemas import MedicoUpdate
+from schemas import PazienteOut, PazienteCreate, PazienteUpdate
+from schemas import MedicoOut, MedicoCreate, MedicoUpdate
+from schemas import UtenteOut, UtenteCreate, UtenteUpdate
 from services import PazienteServices
 from services import MedicoServices
+from services import UtenteServices
 
 app = FastAPI()
 
@@ -82,3 +80,35 @@ async def eliminaMedico(id: int, db: Session = Depends(get_db)):
     service = MedicoServices(db)
     medicoEliminato = service.elimina(id)
     return medicoEliminato
+
+@app.get("/utenti", response_model=list[UtenteOut])
+async def leggiUtenti(db: Session = Depends(get_db)):
+    service = UtenteServices(db)
+    listaUtenti = service.leggiTutti()
+    return listaUtenti
+
+@app.post("/utenti", response_model=UtenteOut, status_code=201)
+async def creaUtente(dati: UtenteCreate, db: Session = Depends(get_db)):
+    service = UtenteServices(db)
+    nuovoUtente = service.crea(dati)
+    return nuovoUtente
+
+@app.get("/utenti/{id}", response_model=UtenteOut)
+async def cercaUtenteId(id: int, db: Session = Depends(get_db)):
+    service = UtenteServices(db)
+    utente = service.cercaId(id)
+    if utente is None:
+        raise HTTPException(status_code=404 ,detail="Utente non trovato")
+    return  utente
+
+@app.patch("/utenti/{id}", response_model=UtenteOut)
+async def aggiornaUtente(id: int, dati: UtenteUpdate, db: Session = Depends(get_db)):
+    service = UtenteServices(db)
+    utenteAggiornato = service.aggiorna(id, dati)
+    return utenteAggiornato
+
+@app.delete("/utenti/{id}")
+async def eliminaUtente(id: int, db: Session = Depends(get_db)):
+    service = UtenteServices(db)
+    utenteEliminato = service.elimina(id)
+    return utenteEliminato
