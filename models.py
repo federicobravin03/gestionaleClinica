@@ -55,7 +55,7 @@ class Medico(Base):
     __tablename__ = "medici"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    numeroAlbo: Mapped[str] = mapped_column(String(10), unique=True)
+    numeroAlbo: Mapped[str] = mapped_column(String(5), unique=True)
     specializzazione: Mapped[str] = mapped_column(String(50))
     utente_id: Mapped[int] = mapped_column(ForeignKey("utenti.id"), unique=True)
     utente: Mapped["Utente"] = relationship(back_populates="medico")

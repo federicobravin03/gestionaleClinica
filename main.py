@@ -4,9 +4,11 @@ from sqlalchemy.orm import Session
 from schemas import PazienteOut, PazienteCreate, PazienteUpdate
 from schemas import MedicoOut, MedicoCreate, MedicoUpdate
 from schemas import UtenteOut, UtenteCreate, UtenteUpdate
+from schemas import AppuntamentoOut, AppuntamentoCreate, AppuntamentoUpdate
 from services import PazienteServices
 from services import MedicoServices
 from services import UtenteServices
+from services import AppuntamentoServices
 
 app = FastAPI()
 
@@ -112,3 +114,35 @@ async def eliminaUtente(id: int, db: Session = Depends(get_db)):
     service = UtenteServices(db)
     utenteEliminato = service.elimina(id)
     return utenteEliminato
+
+@app.get("/appuntamenti", response_model=list[AppuntamentoOut])
+async def leggiAppuntamenti(db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    listaAppuntamenti = service.leggiTutti()
+    return listaAppuntamenti
+
+@app.post("/appuntamenti", response_model=AppuntamentoOut, status_code=201)
+async def creaAppuntamento(dati: AppuntamentoCreate, db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    nuovoAppuntamento = service.crea(dati)
+    return nuovoAppuntamento
+
+@app.get("/appuntamenti/{id}", response_model=AppuntamentoOut)
+async def cercaAppuntamentoId(id: int, db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    appuntamento = service.cercaId(id)
+    if appuntamento is None:
+        raise HTTPException(status_code=404, detail="Appuntamento non trovato")
+    return appuntamento
+
+@app.patch("/appuntamenti/{id}", response_model=AppuntamentoOut)
+async def aggiornaAppuntamento(id: int, dati: AppuntamentoUpdate, db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    appuntamentoAggiornato = service.aggiorna(id, dati)
+    return appuntamentoAggiornato
+
+@app.delete("/appuntamenti/{id}")
+async def eliminaAppuntamento(id: int, db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    appuntamentoEliminato = service.elimina(id)
+    return appuntamentoEliminato

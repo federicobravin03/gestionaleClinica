@@ -1,6 +1,8 @@
 from pydantic import BaseModel, EmailStr
 import datetime
-from models import Sesso, Ruolo
+from decimal import Decimal
+from models import Sesso, Ruolo, StatoAppuntamento
+from models import StatoAppuntamento
 
 class PazienteOut(BaseModel):
     id: int
@@ -9,8 +11,8 @@ class PazienteOut(BaseModel):
     codiceFiscale: str
     dataNascita: datetime.date
     telefono: str
-    email: str | None
-    indirizzo: EmailStr
+    email: EmailStr | None
+    indirizzo: str
     sesso: Sesso
 
     model_config = {"from_attributes": True}
@@ -80,3 +82,22 @@ class UtenteUpdate(BaseModel):
     telefono: str | None = None
     username: str | None = None
     email: EmailStr | None = None
+
+class AppuntamentoOut(BaseModel):
+    id: int
+    dataOra: datetime.datetime
+    stato: StatoAppuntamento
+    prezzo: Decimal | None
+    esito: str | None
+    paziente_id: int
+    medico_id: int
+
+    model_config = {"from_attributes": True}
+
+class AppuntamentoCreate(BaseModel):
+    dataOra: datetime.datetime
+    paziente_id: int
+    medico_id: int
+
+class AppuntamentoUpdate(BaseModel):
+    dataOra: datetime.datetime | None = None

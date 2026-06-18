@@ -1,6 +1,7 @@
 from models import Paziente
 from models import Medico
 from models import Utente
+from models import Appuntamento
 from sqlalchemy import select
 from fastapi import HTTPException
 from passlib.context import CryptContext
@@ -202,3 +203,55 @@ class UtenteServices:
         self.db.delete(utente)
         self.db.commit()
         return{"message": "Utente elimnato con successo"}
+    
+class AppuntamentoServices:
+    def __init__(self, db):
+        self.db = db
+
+    def cercaId(self, id):
+        query = select(Appuntamento).where(Appuntamento.id == id)
+        risultato = self.db.execute(query).scalar_one_or_none()
+        return risultato
+    
+    def crea(self, dati):
+        nuovoAppuntamento = Appuntamento(
+            dataOra = dati.dataOra,
+            paziente_id = dati.paziente_id,
+            medico_id = dati.medico_id
+        )
+
+        self.db.add(nuovoAppuntamento)
+        self.db.commit()
+        self.db.refresh(nuovoAppuntamento)
+
+        return nuovoAppuntamento
+    
+    def leggiTutti(self):
+        query = select(Appuntamento)
+        risultato = self.db.execute(query).scalars().all()
+        return risultato
+    
+    def aggiorna(self, id, dati):
+        appuntamento = self.cercaId(id)
+
+        if appuntamento is None:
+            raise HTTPException(status_code=404, detail="Appuntamento non trovato")
+        
+        campiDaAggiornare = dati.model_dump(exclude_unset=True)
+
+        for campo, valore in campiDaAggiornare.items():
+            setattr(appuntamento, campo, valore)
+
+        self.db.commit()
+        self.db.refresh(appuntamento)
+        return appuntamento
+    
+    def elimina(self, id):
+        appuntamento = self.cercaId(id)
+
+        if appuntamento is None:
+            raise HTTPException(status_code=404, detail="Appuntamento non trovato")
+        
+        self.db.delete(appuntamento)
+        self.db.commit()
+        return{"message": "Appuntamento eliminato con successo"}
