@@ -101,3 +101,7 @@ class AppuntamentoCreate(BaseModel):
 
 class AppuntamentoUpdate(BaseModel):
     dataOra: datetime.datetime | None = None
+
+class AppuntamentoConcludi(BaseModel):
+    prezzo: Decimal
+    esito: str

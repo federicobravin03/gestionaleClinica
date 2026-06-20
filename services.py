@@ -2,6 +2,7 @@ from models import Paziente
 from models import Medico
 from models import Utente
 from models import Appuntamento
+from models import StatoAppuntamento
 from sqlalchemy import select
 from fastapi import HTTPException
 from passlib.context import CryptContext
@@ -213,7 +214,21 @@ class AppuntamentoServices:
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
     
+    def cercaMedicoEOra(self, medico_id, dataOra):
+        query = select(Appuntamento).where(
+            Appuntamento.medico_id == medico_id,
+            Appuntamento.dataOra == dataOra
+        )
+        
+        risulato = self.db.execute(query).scalar_one_or_none()
+        return risulato
+    
     def crea(self, dati):
+        occupato = self.cercaMedicoEOra(dati.medico_id, dati.dataOra)
+
+        if occupato is not None:
+            raise HTTPException(status_code=409, detail="Il medico ha già un appuntamento in questo orario")
+
         nuovoAppuntamento = Appuntamento(
             dataOra = dati.dataOra,
             paziente_id = dati.paziente_id,
@@ -255,3 +270,50 @@ class AppuntamentoServices:
         self.db.delete(appuntamento)
         self.db.commit()
         return{"message": "Appuntamento eliminato con successo"}
+    
+    def annulla(self, id):
+        appuntamento = self.cercaId(id)
+
+        if appuntamento is None:
+            raise HTTPException(status_code=404, detail="Appuntamento non trovato")
+
+        if appuntamento.stato != StatoAppuntamento.PROGRAMMATO:
+            raise HTTPException(status_code=409, detail="L'appuntamento non può essere annullato")
+        
+        appuntamento.stato = StatoAppuntamento.ANNULLATO
+        
+        self.db.commit()
+        self.db.refresh(appuntamento)
+        return appuntamento
+
+    def inizia(self, id):
+        appuntamento = self.cercaId(id)
+
+        if appuntamento is None:
+            raise HTTPException(status_code=404, detail="Appuntamento non trovato")
+        
+        if appuntamento.stato != StatoAppuntamento.PROGRAMMATO:
+            raise HTTPException(status_code=409, detail="L'appuntamento non può essere iniziato")
+        
+        appuntamento.stato = StatoAppuntamento.INCORSO
+
+        self.db.commit()
+        self.db.refresh(appuntamento)
+        return appuntamento
+
+    def concludi(self, id, dati):
+        appuntamento = self.cercaId(id)
+
+        if appuntamento is None:
+            raise HTTPException(status_code=404, detail="Appuntamento non trovato")
+        
+        if appuntamento.stato != StatoAppuntamento.INCORSO:
+            raise HTTPException(status_code=409, detail="L'appuntamento non può essere concluso")
+
+        appuntamento.stato = StatoAppuntamento.CONCLUSO
+        appuntamento.prezzo = dati.prezzo
+        appuntamento.esito = dati.esito
+
+        self.db.commit()
+        self.db.refresh(appuntamento)   
+        return appuntamento

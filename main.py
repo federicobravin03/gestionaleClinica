@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from schemas import PazienteOut, PazienteCreate, PazienteUpdate
 from schemas import MedicoOut, MedicoCreate, MedicoUpdate
 from schemas import UtenteOut, UtenteCreate, UtenteUpdate
-from schemas import AppuntamentoOut, AppuntamentoCreate, AppuntamentoUpdate
+from schemas import AppuntamentoOut, AppuntamentoCreate, AppuntamentoUpdate, AppuntamentoConcludi
 from services import PazienteServices
 from services import MedicoServices
 from services import UtenteServices
@@ -146,3 +146,21 @@ async def eliminaAppuntamento(id: int, db: Session = Depends(get_db)):
     service = AppuntamentoServices(db)
     appuntamentoEliminato = service.elimina(id)
     return appuntamentoEliminato
+
+@app.post("/appuntamenti/{id}/annulla", response_model=AppuntamentoOut)
+async def annullaAppuntamento(id: int, db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    appuntamentoAnnullato = service.annulla(id)
+    return appuntamentoAnnullato
+
+@app.post("/appuntamenti/{id}/inizia", response_model=AppuntamentoOut)
+async def iniziaAppuntamento(id: int, db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    appuntamentoInizia = service.inizia(id)
+    return appuntamentoInizia
+
+@app.post("/appuntamenti/{id}/concludi", response_model=AppuntamentoOut)
+async def concludiAppuntamento(id: int, dati: AppuntamentoConcludi, db: Session = Depends(get_db)):
+    service = AppuntamentoServices(db)
+    appuntamentoConcludi = service.concludi(id, dati)
+    return appuntamentoConcludi
