@@ -5,10 +5,12 @@ from schemas import PazienteOut, PazienteCreate, PazienteUpdate
 from schemas import MedicoOut, MedicoCreate, MedicoUpdate
 from schemas import UtenteOut, UtenteCreate, UtenteUpdate
 from schemas import AppuntamentoOut, AppuntamentoCreate, AppuntamentoUpdate, AppuntamentoConcludi
+from schemas import Login
 from services import PazienteServices
 from services import MedicoServices
 from services import UtenteServices
 from services import AppuntamentoServices
+from auth import verificaPassword, creaToken, utenteCorrente, soloAdmin
 
 app = FastAPI()
 
@@ -20,7 +22,7 @@ async def root():
 Base.metadata.create_all(engine)
 
 @app.get("/pazienti", response_model=list[PazienteOut])
-async def leggiPazienti(db: Session = Depends(get_db)):
+async def leggiPazienti(db: Session = Depends(get_db), utente = Depends(utenteCorrente)):
     service = PazienteServices(db)
     listaPazienti = service.leggiTutti()
     return listaPazienti
@@ -58,7 +60,7 @@ async def leggiMedici(db: Session = Depends(get_db)):
     return listaMedici
 
 @app.post("/medici", response_model=MedicoOut, status_code=201)
-async def creaMedici(dati: MedicoCreate, db: Session = Depends(get_db)):
+async def creaMedici(dati: MedicoCreate, db: Session = Depends(get_db), utente = Depends(soloAdmin)):
     service = MedicoServices(db)
     nuovoMedico = service.crea(dati)
     return nuovoMedico
@@ -164,3 +166,20 @@ async def concludiAppuntamento(id: int, dati: AppuntamentoConcludi, db: Session 
     service = AppuntamentoServices(db)
     appuntamentoConcludi = service.concludi(id, dati)
     return appuntamentoConcludi
+
+@app.post("/login")
+async def login(dati: Login, db: Session = Depends(get_db)):
+    service = UtenteServices(db)
+    utente = service.cercaUsername(dati.username)
+
+    if utente is None:
+        raise HTTPException(status_code=401, detail="Credenziali non valide")
+    
+    passwordVerificata = verificaPassword(dati.password, utente.passwordHash)
+
+    if not passwordVerificata:
+        raise HTTPException(status_code=401, detail="Credenziali non valide")
+    
+    token = creaToken(utente.id, utente.ruolo.value)
+
+    return {"access_token": token, "token_type": "bearer"}

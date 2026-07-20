@@ -105,3 +105,7 @@ class AppuntamentoUpdate(BaseModel):
 class AppuntamentoConcludi(BaseModel):
     prezzo: Decimal
     esito: str
+
+class Login(BaseModel):
+    username: str
+    password: str

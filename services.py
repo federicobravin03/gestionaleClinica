@@ -5,9 +5,7 @@ from models import Appuntamento
 from models import StatoAppuntamento
 from sqlalchemy import select
 from fastapi import HTTPException
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from auth import pwd_context
 
 class PazienteServices:
     def __init__(self, db):
@@ -144,6 +142,11 @@ class UtenteServices:
     
     def cercaCodiceFiscale(self, codiceFiscale):
         query = select(Utente).where(Utente.codiceFiscale == codiceFiscale)
+        risultato = self.db.execute(query).scalar_one_or_none()
+        return risultato
+    
+    def cercaUsername(self, username):
+        query = select(Utente).where(Utente.username == username)
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
 
