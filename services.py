@@ -3,6 +3,7 @@ from models import Medico
 from models import Utente
 from models import Appuntamento
 from models import StatoAppuntamento
+from models import Utente
 from sqlalchemy import select
 from fastapi import HTTPException
 from auth import pwd_context
@@ -83,11 +84,24 @@ class MedicoServices:
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
     
+    def cercaUtenteId(self, utente_id):
+        query = select(Medico).where(Medico.utente_id == utente_id)
+        risultato = self.db.execute(query).scalar_one_or_none()
+        return risultato
+    
     def crea(self, dati):
-        esisitente = self.cercaNumeroAlbo(dati.numeroAlbo)
+        esistente = self.cercaNumeroAlbo(dati.numeroAlbo)
 
-        if esisitente is not None:
+        if esistente is not None:
             raise HTTPException(status_code=409, detail="Medico già esistente")
+        
+        utente = UtenteServices(self.db).cercaId(dati.utente_id)
+
+        if utente is None:
+            raise HTTPException(status_code=404, detail="Utente non trovato")
+        
+        if self.cercaUtenteId(dati.utente_id) is not None:
+            raise HTTPException(status_code=409, detail="Utente già associato a un medico")
         
         nuovoMedico = Medico(
             utente_id = dati.utente_id,
