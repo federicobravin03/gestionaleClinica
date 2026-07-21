@@ -89,6 +89,11 @@ class MedicoServices:
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
     
+    def leggiPerMedico(self, medico_id):
+        query = select(Appuntamento).where(Appuntamento.medico_id == medico_id)
+        risultato = self.db.execute(query).scalars().all()
+        return risultato
+    
     def crea(self, dati):
         esistente = self.cercaNumeroAlbo(dati.numeroAlbo)
 

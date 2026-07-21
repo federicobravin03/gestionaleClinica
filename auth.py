@@ -45,3 +45,10 @@ def soloAdmin(utente = Depends(utenteCorrente)):
         raise HTTPException(status_code=403, detail="Operazione riservata agli amministratori")
     else:
         return utente
+    
+def richiediRuoli(*ruoliAmmessi):
+    def controllo(utente = Depends(utenteCorrente)):
+        if utente["ruolo"] not in ruoliAmmessi:
+            raise HTTPException(status_code=403, detail="Utente non autorizzato")
+        return utente
+    return controllo
