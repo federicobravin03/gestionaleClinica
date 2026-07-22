@@ -71,7 +71,6 @@ class UtenteCreate(BaseModel):
     codiceFiscale: str
     ruolo: Ruolo
     telefono: str
-    username: str
     email: EmailStr
     password: str
 
@@ -80,7 +79,6 @@ class UtenteUpdate(BaseModel):
     cognome: str | None = None
     ruolo: Ruolo | None = None
     telefono: str | None = None
-    username: str | None = None
     email: EmailStr | None = None
 
 class AppuntamentoOut(BaseModel):

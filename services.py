@@ -3,10 +3,16 @@ from models import Medico
 from models import Utente
 from models import Appuntamento
 from models import StatoAppuntamento
-from models import Utente
 from sqlalchemy import select
 from fastapi import HTTPException
 from auth import pwd_context
+from email_service import emailConferma
+import unicodedata
+
+def normalizza(testo):
+    testo = unicodedata.normalize("NFD", testo)
+    testo = "".join(c for c in testo if unicodedata.category(c) != "Mn")
+    return testo.lower().replace(" ", "").replace("'", "")
 
 class PazienteServices:
     def __init__(self, db):
@@ -89,11 +95,6 @@ class MedicoServices:
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
     
-    def leggiPerMedico(self, medico_id):
-        query = select(Appuntamento).where(Appuntamento.medico_id == medico_id)
-        risultato = self.db.execute(query).scalars().all()
-        return risultato
-    
     def crea(self, dati):
         esistente = self.cercaNumeroAlbo(dati.numeroAlbo)
 
@@ -168,13 +169,26 @@ class UtenteServices:
         query = select(Utente).where(Utente.username == username)
         risultato = self.db.execute(query).scalar_one_or_none()
         return risultato
+    
+    def generaUsername(self, nome, cognome):
+        base = normalizza(nome) + "." + normalizza(cognome)
+        username = base
+        contatore = 2
+
+        while self.cercaUsername(username) is not None:
+            username = base + str(contatore)
+            contatore = contatore + 1
+        
+        return username
 
     def crea(self, dati):
         esistente = self.cercaCodiceFiscale(dati.codiceFiscale)
 
         if esistente is not None:
             raise HTTPException(status_code=409, detail="Utente già esistente")
-        
+
+        username = self.generaUsername(dati.nome, dati.cognome)
+
         nuovoUtente = Utente(
             nome = dati.nome,
             cognome = dati.cognome,
@@ -182,7 +196,7 @@ class UtenteServices:
             ruolo = dati.ruolo,
             telefono = dati.telefono,
             email = dati.email,
-            username = dati.username,
+            username = username,
             passwordHash = pwd_context.hash(dati.password)
         )
 
@@ -245,6 +259,11 @@ class AppuntamentoServices:
         risulato = self.db.execute(query).scalar_one_or_none()
         return risulato
     
+    def leggiPerMedico(self, medico_id):
+        query = select(Appuntamento).where(Appuntamento.medico_id == medico_id)
+        risultato = self.db.execute(query).scalars().all()
+        return risultato
+    
     def crea(self, dati):
         occupato = self.cercaMedicoEOra(dati.medico_id, dati.dataOra)
 
@@ -260,6 +279,11 @@ class AppuntamentoServices:
         self.db.add(nuovoAppuntamento)
         self.db.commit()
         self.db.refresh(nuovoAppuntamento)
+
+        paziente = PazienteServices(self.db).cercaId(dati.paziente_id)
+
+        if paziente.email is not None:
+            emailConferma(paziente.email, nuovoAppuntamento.dataOra)
 
         return nuovoAppuntamento
     
