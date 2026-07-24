@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine, get_db
 from sqlalchemy.orm import Session
 from schemas import PazienteOut, PazienteCreate, PazienteUpdate
@@ -14,10 +15,13 @@ from auth import verificaPassword, creaToken, richiediRuoli
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    return {"message": "ciao mondo"}
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Base.metadata.create_all(engine)
 
