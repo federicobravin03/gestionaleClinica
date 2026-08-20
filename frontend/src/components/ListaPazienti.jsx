@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
-function ListaPazienti({aggiornamento}) {
+function ListaPazienti({ aggiornamento }) {
     const [pazienti, setPazienti] = useState([]);
     const [messaggio, setMessaggio] = useState("");
+    const [inModifica, setInModifica] = useState(null);
 
     const caricaPazienti = async () => {
         const token = localStorage.getItem("token");
@@ -22,6 +23,51 @@ function ListaPazienti({aggiornamento}) {
         }
     }
 
+    const eliminaPaziente = async (id) => {
+        const token = localStorage.getItem("token");
+
+        if (!confirm("Eliminare il paziente?")) {
+            return;
+        }
+
+        const risposta = await fetch(`http://localhost:8000/pazienti/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (risposta.ok) {
+            caricaPazienti();
+        } else {
+            setMessaggio("Errore durante l'eliminazione");
+        }
+    }
+
+    const salvaModifica = async () => {
+        const token = localStorage.getItem("token");
+
+        const risposta = await fetch(`http://localhost:8000/pazienti/${inModifica.id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(inModifica)
+        });
+
+        if (risposta.ok) {
+            setInModifica(null);
+            caricaPazienti();
+        } else {
+            setMessaggio("Errore durante la modifica");
+        }
+    }
+
+    const aggiornaCampoModifica = (campo, valore) => {
+        setInModifica({ ...inModifica, [campo]: valore });
+    }
+
     useEffect(() => {
         caricaPazienti();
     }, [aggiornamento])
@@ -30,7 +76,38 @@ function ListaPazienti({aggiornamento}) {
         <div>
             <ul>
                 {pazienti.map((paziente) => (
-                    <li key={paziente.id}>{paziente.nome} {paziente.cognome}</li>
+                    <li key={paziente.id}>
+                        {paziente.nome} {paziente.cognome}
+
+                        {inModifica && inModifica.id === paziente.id ? (
+                            <span>
+                                <input
+                                    type="text"
+                                    value={inModifica.telefono}
+                                    onChange={(e) => aggiornaCampoModifica("telefono", e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    value={inModifica.email || ""}
+                                    onChange={(e) => aggiornaCampoModifica("email", e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    value={inModifica.indirizzo}
+                                    onChange={(e) => aggiornaCampoModifica("indirizzo", e.target.value)}
+                                />
+
+                                <button onClick={salvaModifica}>Salva</button>
+                                <button onClick={() => setInModifica(null)}>Annulla</button>
+                            </span>
+                        ) : (
+                            <span>
+                                <button onClick={() => eliminaPaziente(paziente.id)}>Elimina</button>
+                                <button onClick={() => setInModifica(paziente)}>Modifica</button>
+                            </span>    
+                        )}
+
+                    </li>
                 ))}
             </ul>
             <p>{messaggio}</p>

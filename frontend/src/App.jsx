@@ -6,6 +6,7 @@ import NuovoPaziente from "./components/NuovoPaziente";
 function App() {
   const [autenticato, setAutenticato] = useState(localStorage.getItem("token") !== null);
   const [aggiornamento, setAggiornamento] = useState(0);
+  const [sezione, setSezione] = useState("pazienti");
 
   const eseguiLogout = () => {
     localStorage.removeItem("token");
@@ -17,7 +18,7 @@ function App() {
   }
 
   const gestionePazienteCreato = () => {
-    setAggiornamento(aggiornamento+1);
+    setAggiornamento(aggiornamento + 1);
   }
 
   return (
@@ -26,12 +27,31 @@ function App() {
 
       {autenticato ? (
         <div>
-          <ListaPazienti aggiornamento={aggiornamento}/>
-          <NuovoPaziente onPazienteCreato={gestionePazienteCreato}/>
+          <nav>
+            <button onClick={() => setSezione("pazienti")} disabled={sezione === "pazienti"}>Pazienti</button>
+            <button onClick={() => setSezione("medici")} disabled={sezione === "medici"}>Medici</button>
+            <button onClick={() => setSezione("appuntamenti")} disabled={sezione === "appuntamenti"}>Appuntamenti</button>
+          </nav>
+
+          {sezione === "pazienti" && (
+            <div>
+              <ListaPazienti aggiornamento={aggiornamento} />
+              <NuovoPaziente onPazienteCreato={gestionePazienteCreato} />
+            </div>
+          )}
+
+          {sezione === "medici" && (
+            <p>Sezione medici da realizzare</p>
+          )}
+
+          {sezione === "appuntamenti" && (
+            <p>Sezione appuntamenti da realizzare</p>
+          )}
+
           <button onClick={eseguiLogout}>Logout</button>
         </div>
       ) : (
-          <Login onLoginRiuscito={gestioneLogin} />
+        <Login onLoginRiuscito={gestioneLogin} />
       )}
     </div>
   )
