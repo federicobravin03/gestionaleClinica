@@ -14,7 +14,7 @@ function Login({ onLoginRiuscito }) {
 
         const dati = await risposta.json();
 
-        if (risposta.ok) {
+        if(risposta.ok) {
             localStorage.setItem("token", dati.access_token);
             onLoginRiuscito();
         } else {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ListaPazienti() {
+function ListaPazienti({aggiornamento}) {
     const [pazienti, setPazienti] = useState([]);
     const [messaggio, setMessaggio] = useState("");
 
@@ -24,7 +24,7 @@ function ListaPazienti() {
 
     useEffect(() => {
         caricaPazienti();
-    }, [])
+    }, [aggiornamento])
 
     return (
         <div>
