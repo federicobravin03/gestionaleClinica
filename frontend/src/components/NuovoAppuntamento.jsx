@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function NuovoAppuntamento({onAppuntamentoCreato}) {
+function NuovoAppuntamento({onAppuntamentoCreato, onSessioneScaduta}) {
     const [pazienti, setPazienti] = useState([]);
     const [medici, setMedici] = useState([]);
     const [messaggio, setMessaggio] = useState("");
@@ -35,6 +35,8 @@ function NuovoAppuntamento({onAppuntamentoCreato}) {
             })
             onAppuntamentoCreato();
             setMessaggio("Appuntamento creato con successo");
+        } else if (risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             const risultato = await risposta.json();
             setMessaggio("Errore: " + JSON.stringify(risultato.detail));
@@ -54,6 +56,8 @@ function NuovoAppuntamento({onAppuntamentoCreato}) {
 
         if (risposta.ok) {
             setPazienti(elenco);
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");
         }
@@ -72,6 +76,8 @@ function NuovoAppuntamento({onAppuntamentoCreato}) {
 
         if (risposta.ok) {
             setMedici(elenco);
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");
         }

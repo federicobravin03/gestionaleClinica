@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ListaPazienti({ aggiornamento }) {
+function ListaPazienti({ aggiornamento, onSessioneScaduta}) {
     const [pazienti, setPazienti] = useState([]);
     const [messaggio, setMessaggio] = useState("");
     const [inModifica, setInModifica] = useState(null);
@@ -18,8 +18,10 @@ function ListaPazienti({ aggiornamento }) {
 
         if (risposta.ok) {
             setPazienti(dati);
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
-            setMessaggio("Errore durante il caricamento")
+            setMessaggio("Errore durante il caricamento");
         }
     }
 
@@ -39,6 +41,8 @@ function ListaPazienti({ aggiornamento }) {
 
         if (risposta.ok) {
             caricaPazienti();
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             setMessaggio("Errore durante l'eliminazione");
         }
@@ -59,6 +63,8 @@ function ListaPazienti({ aggiornamento }) {
         if (risposta.ok) {
             setInModifica(null);
             caricaPazienti();
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             setMessaggio("Errore durante la modifica");
         }

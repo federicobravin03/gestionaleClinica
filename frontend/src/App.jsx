@@ -9,6 +9,7 @@ function App() {
   const [autenticato, setAutenticato] = useState(localStorage.getItem("token") !== null);
   const [aggiornamento, setAggiornamento] = useState(0);
   const [sezione, setSezione] = useState("pazienti");
+  const [messaggio, setMessaggio] = useState("");
 
   const eseguiLogout = () => {
     localStorage.removeItem("token");
@@ -21,6 +22,12 @@ function App() {
 
   const gestionePazienteCreato = () => {
     setAggiornamento(aggiornamento + 1);
+  }
+
+  const gestioneSessioneScaduta = () => {
+    localStorage.removeItem("token");
+    setAutenticato(false);
+    setMessaggio("Sessione scaduta, effettuare nuovamente il login");
   }
 
   return (
@@ -37,8 +44,8 @@ function App() {
 
           {sezione === "pazienti" && (
             <div>
-              <ListaPazienti aggiornamento={aggiornamento} />
-              <NuovoPaziente onPazienteCreato={gestionePazienteCreato} />
+              <ListaPazienti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
+              <NuovoPaziente onPazienteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
             </div>
           )}
 
@@ -48,8 +55,8 @@ function App() {
 
           {sezione === "appuntamenti" && (
             <div>
-              <ListaAppuntamenti aggiornamento={aggiornamento} />
-              <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} />
+              <ListaAppuntamenti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
+              <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
             </div>
           )}
 

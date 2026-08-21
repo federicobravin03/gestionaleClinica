@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ListaAppuntamenti({ aggiornamento }) {
+function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
     const [appuntamenti, setAppuntamenti] = useState([]);
     const [pazienti, setPazienti] = useState([]);
     const [medici, setMedici] = useState([]);
@@ -19,6 +19,8 @@ function ListaAppuntamenti({ aggiornamento }) {
 
         if (risposta.ok) {
             setAppuntamenti(dati);
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");
         }
@@ -37,6 +39,8 @@ function ListaAppuntamenti({ aggiornamento }) {
 
         if (risposta.ok) {
             setPazienti(dati);
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");
         }
@@ -55,6 +59,8 @@ function ListaAppuntamenti({ aggiornamento }) {
 
         if (risposta.ok) {
             setMedici(dati);
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");
         }

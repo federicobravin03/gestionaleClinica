@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function NuovoPaziente({onPazienteCreato}) {
+function NuovoPaziente({onPazienteCreato, onSessioneScaduta}) {
     const [messaggio, setMessaggio] = useState("");
 
     const [dati, setDati] = useState({
@@ -17,7 +17,6 @@ function NuovoPaziente({onPazienteCreato}) {
     const aggiornaCampo = (campo, valore) => {
         setDati({ ...dati, [campo]: valore });
     }
-
 
     const creaPaziente = async () => {
         const token = localStorage.getItem("token");
@@ -45,6 +44,8 @@ function NuovoPaziente({onPazienteCreato}) {
             })
             onPazienteCreato();
             setMessaggio("Paziente creato con successo");
+        } else if(risposta.status === 401) {
+            onSessioneScaduta();
         } else {
             const risultato = await risposta.json();
             setMessaggio("Errore: " + JSON.stringify(risultato.detail));
