@@ -36,23 +36,6 @@ class PazienteUpdate(BaseModel):
     indirizzo: str | None = None
     sesso: Sesso | None = None
 
-class MedicoOut(BaseModel):
-    id: int
-    utente_id: int
-    numeroAlbo: str
-    specializzazione: str
-
-    model_config = {"from_attributes": True}
-
-class MedicoCreate(BaseModel):
-    utente_id: int
-    numeroAlbo: str
-    specializzazione: str
-
-class MedicoUpdate(BaseModel):
-    numeroAlbo: str | None = None
-    specializzazione: str | None = None
-
 class UtenteOut(BaseModel):
     id: int
     nome: str
@@ -80,6 +63,31 @@ class UtenteUpdate(BaseModel):
     ruolo: Ruolo | None = None
     telefono: str | None = None
     email: EmailStr | None = None
+
+class UtenteRidotto(BaseModel):
+    id: int
+    nome: str
+    cognome: str
+
+    model_config = {"from_attributes": True}
+
+class MedicoOut(BaseModel):
+    id: int
+    utente_id: int
+    numeroAlbo: str
+    specializzazione: str
+    utente: UtenteRidotto
+
+    model_config = {"from_attributes": True}
+
+class MedicoCreate(BaseModel):
+    utente_id: int
+    numeroAlbo: str
+    specializzazione: str
+
+class MedicoUpdate(BaseModel):
+    numeroAlbo: str | None = None
+    specializzazione: str | None = None
 
 class AppuntamentoOut(BaseModel):
     id: int

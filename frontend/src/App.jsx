@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Login from "./components/Login";
 import ListaPazienti from "./components/ListaPazienti";
 import NuovoPaziente from "./components/NuovoPaziente";
+import ListaAppuntamenti from "./components/ListaAppuntamenti";
+import NuovoAppuntamento from "./components/NuovoAppuntamento";
 
 function App() {
   const [autenticato, setAutenticato] = useState(localStorage.getItem("token") !== null);
@@ -45,7 +47,10 @@ function App() {
           )}
 
           {sezione === "appuntamenti" && (
-            <p>Sezione appuntamenti da realizzare</p>
+            <div>
+              <ListaAppuntamenti aggiornamento={aggiornamento} />
+              <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} />
+            </div>
           )}
 
           <button onClick={eseguiLogout}>Logout</button>

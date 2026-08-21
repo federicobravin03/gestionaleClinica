@@ -256,8 +256,17 @@ class AppuntamentoServices:
             Appuntamento.dataOra == dataOra
         )
         
-        risulato = self.db.execute(query).scalar_one_or_none()
+        risulato = self.db.execute(query).scalars().first()
         return risulato
+
+    def cercaPazienteEOra(self, paziente_id, dataOra):
+        query = select(Appuntamento).where(
+            Appuntamento.paziente_id == paziente_id,
+            Appuntamento.dataOra == dataOra
+        )
+        
+        risultato = self.db.execute(query).scalars().first()
+        return risultato
     
     def leggiPerMedico(self, medico_id):
         query = select(Appuntamento).where(Appuntamento.medico_id == medico_id)
@@ -266,9 +275,12 @@ class AppuntamentoServices:
     
     def crea(self, dati):
         occupato = self.cercaMedicoEOra(dati.medico_id, dati.dataOra)
-
         if occupato is not None:
             raise HTTPException(status_code=409, detail="Il medico ha già un appuntamento in questo orario")
+        
+        occupatoPaziente = self.cercaPazienteEOra(dati.paziente_id, dati.dataOra)
+        if occupatoPaziente is not None:
+            raise HTTPException(status_code=409, detail="Il paziente ha già un appuntamento un questo orario")
 
         nuovoAppuntamento = Appuntamento(
             dataOra = dati.dataOra,

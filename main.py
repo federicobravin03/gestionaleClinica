@@ -123,9 +123,10 @@ async def eliminaUtente(id: int, db: Session = Depends(get_db), utente = Depends
 
 @app.get("/appuntamenti", response_model=list[AppuntamentoOut])
 async def leggiAppuntamenti(db: Session = Depends(get_db), utente = Depends(richiediRuoli("Admin", "Segreteria", "Medico"))):
+    service = AppuntamentoServices(db)
+
     if utente["ruolo"] == "Medico":
         medico = MedicoServices(db).cercaUtenteId(int(utente["sub"]))
-        service = AppuntamentoServices(db)
         
         if medico is None:
             raise HTTPException(status_code=404, detail="Nessun medico associato a questo utente")
