@@ -4,6 +4,8 @@ import ListaPazienti from "./components/ListaPazienti";
 import NuovoPaziente from "./components/NuovoPaziente";
 import ListaAppuntamenti from "./components/ListaAppuntamenti";
 import NuovoAppuntamento from "./components/NuovoAppuntamento";
+import ListaMedici from "./components/ListaMedici";
+import NuovoMedico from "./components/NuovoMedico";
 
 function App() {
   const [autenticato, setAutenticato] = useState(localStorage.getItem("token") !== null);
@@ -50,7 +52,10 @@ function App() {
           )}
 
           {sezione === "medici" && (
-            <p>Sezione medici da realizzare</p>
+            <div>
+              <ListaMedici aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
+              <NuovoMedico onMedicoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
+            </div>
           )}
 
           {sezione === "appuntamenti" && (
