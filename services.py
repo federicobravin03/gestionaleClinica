@@ -6,6 +6,7 @@ from models import StatoAppuntamento
 from sqlalchemy import select
 from fastapi import HTTPException
 from auth import pwd_context
+from datetime import datetime
 from email_service import emailConferma
 import unicodedata
 
@@ -274,6 +275,9 @@ class AppuntamentoServices:
         return risultato
     
     def crea(self, dati):
+        if dati.dataOra < datetime.now():
+            raise HTTPException(status_code=400, detail="Non è possibile prenotare un appuntamento nel passato")
+        
         occupato = self.cercaMedicoEOra(dati.medico_id, dati.dataOra)
         if occupato is not None:
             raise HTTPException(status_code=409, detail="Il medico ha già un appuntamento in questo orario")

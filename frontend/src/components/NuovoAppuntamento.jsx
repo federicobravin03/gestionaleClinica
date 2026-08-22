@@ -90,7 +90,7 @@ function NuovoAppuntamento({onAppuntamentoCreato, onSessioneScaduta}) {
 
     return (
         <div>
-            <input type="datetime-local" value={dati.dataOra} onChange={(e) => aggiornaCampo("dataOra", e.target.value)} />
+            <input type="datetime-local" min={new Date().toISOString().slice(0, 16)} value={dati.dataOra} onChange={(e) => aggiornaCampo("dataOra", e.target.value)} />
 
             <select value={dati.paziente_id} onChange={(e) => aggiornaCampo("paziente_id", e.target.value)}>
                 <option value="">Seleziona paziente</option>
