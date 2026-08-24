@@ -6,6 +6,8 @@ import ListaAppuntamenti from "./components/ListaAppuntamenti";
 import NuovoAppuntamento from "./components/NuovoAppuntamento";
 import ListaMedici from "./components/ListaMedici";
 import NuovoMedico from "./components/NuovoMedico";
+import ListaUtenti from "./components/ListaUtenti";
+import NuovoUtente from "./components/NuovoUtente";
 
 function App() {
   const [autenticato, setAutenticato] = useState(localStorage.getItem("token") !== null);
@@ -42,6 +44,7 @@ function App() {
             <button onClick={() => setSezione("pazienti")} disabled={sezione === "pazienti"}>Pazienti</button>
             <button onClick={() => setSezione("medici")} disabled={sezione === "medici"}>Medici</button>
             <button onClick={() => setSezione("appuntamenti")} disabled={sezione === "appuntamenti"}>Appuntamenti</button>
+            <button onClick={() => setSezione("utenti")} disabled={sezione === "utenti"}>Utenti</button>
           </nav>
 
           {sezione === "pazienti" && (
@@ -62,6 +65,13 @@ function App() {
             <div>
               <ListaAppuntamenti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
               <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
+            </div>
+          )}
+
+          {sezione == "utenti" && (
+            <div>
+              <ListaUtenti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
+              <NuovoUtente onUtenteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
             </div>
           )}
 

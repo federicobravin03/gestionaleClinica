@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function NuovoPaziente({onPazienteCreato, onSessioneScaduta}) {
+function NuovoPaziente({ onPazienteCreato, onSessioneScaduta }) {
     const [messaggio, setMessaggio] = useState("");
 
     const [dati, setDati] = useState({
@@ -19,7 +19,14 @@ function NuovoPaziente({onPazienteCreato, onSessioneScaduta}) {
     }
 
     const creaPaziente = async () => {
+        if(dati.nome === "" || dati.cognome === "" || dati.codiceFiscale === "" || dati.dataNascita === "" || dati.telefono === "" || dati.indirizzo === "" || dati.sesso === "") {
+            setMessaggio("Compilare tutti i campi obbligatori");
+            return;
+        }
+
         const token = localStorage.getItem("token");
+
+        const daInviare = {...dati, email: dati.email === "" ? null: email.dati};
 
         const risposta = await fetch("http://localhost:8000/pazienti", {
             method: "POST",
@@ -28,7 +35,7 @@ function NuovoPaziente({onPazienteCreato, onSessioneScaduta}) {
                 "Authorization": `Bearer ${token}`
             },
 
-            body: JSON.stringify(dati)
+            body: JSON.stringify(daInviare)
         });
 
         if (risposta.ok) {
@@ -44,7 +51,7 @@ function NuovoPaziente({onPazienteCreato, onSessioneScaduta}) {
             })
             onPazienteCreato();
             setMessaggio("Paziente creato con successo");
-        } else if(risposta.status === 401) {
+        } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
             const risultato = await risposta.json();
