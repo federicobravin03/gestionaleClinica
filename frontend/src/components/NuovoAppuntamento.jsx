@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function NuovoAppuntamento({onAppuntamentoCreato, onSessioneScaduta}) {
+function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta }) {
     const [pazienti, setPazienti] = useState([]);
     const [medici, setMedici] = useState([]);
     const [messaggio, setMessaggio] = useState("");
@@ -11,10 +11,15 @@ function NuovoAppuntamento({onAppuntamentoCreato, onSessioneScaduta}) {
     });
 
     const aggiornaCampo = (campo, valore) => {
-        setDati({...dati, [campo]: valore});
+        setDati({ ...dati, [campo]: valore });
     }
 
     const creaAppuntamento = async () => {
+        if(dati.dataOra === "" || dati.paziente_id === "" || dati.medico_id === "") {
+            setMessaggio("Compilare tutti i campi");
+            return;
+        }
+
         const token = localStorage.getItem("token");
 
         const risposta = await fetch("http://localhost:8000/appuntamenti", {
@@ -56,7 +61,7 @@ function NuovoAppuntamento({onAppuntamentoCreato, onSessioneScaduta}) {
 
         if (risposta.ok) {
             setPazienti(elenco);
-        } else if(risposta.status === 401) {
+        } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");
@@ -76,7 +81,7 @@ function NuovoAppuntamento({onAppuntamentoCreato, onSessioneScaduta}) {
 
         if (risposta.ok) {
             setMedici(elenco);
-        } else if(risposta.status === 401) {
+        } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");

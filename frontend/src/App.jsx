@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import "./App.css";
 import Login from "./components/Login";
 import ListaPazienti from "./components/ListaPazienti";
 import NuovoPaziente from "./components/NuovoPaziente";
@@ -49,49 +50,52 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>Gestionale Poliambulatorio</h1>
-
+    <div className="app">
       {autenticato ? (
         <div>
-          <nav>
-            <button onClick={() => setSezione("pazienti")} disabled={sezione === "pazienti"}>Pazienti</button>
-            <button onClick={() => setSezione("medici")} disabled={sezione === "medici"}>Medici</button>
-            <button onClick={() => setSezione("appuntamenti")} disabled={sezione === "appuntamenti"}>Appuntamenti</button>
+          <div className="barra-superiore">
+            <span className="barra-titolo">Gestionale Poliambulatorio</span>
+            <button className="bottone-esci" onClick={eseguiLogout}>Esci</button>
+          </div>
+
+          <nav className="navigazione">
+            <button className="nav-voce" onClick={() => setSezione("pazienti")} disabled={sezione === "pazienti"}>Pazienti</button>
+            <button className="nav-voce" onClick={() => setSezione("medici")} disabled={sezione === "medici"}>Medici</button>
+            <button className="nav-voce" onClick={() => setSezione("appuntamenti")} disabled={sezione === "appuntamenti"}>Appuntamenti</button>
             {ruolo === "Admin" && (
-              <button onClick={() => setSezione("utenti")} disabled={sezione === "utenti"}>Utenti</button>
+              <button className="nav-voce" onClick={() => setSezione("utenti")} disabled={sezione === "utenti"}>Utenti</button>
             )}
           </nav>
 
-          {sezione === "pazienti" && (
-            <div>
-              <ListaPazienti aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
-              {(ruolo === "Admin" || ruolo === "Segreteria") && <NuovoPaziente onPazienteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
-            </div>
-          )}
+          <div className="contenuto">
+            {sezione === "pazienti" && (
+              <div>
+                <ListaPazienti aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
+                {(ruolo === "Admin" || ruolo === "Segreteria") && <NuovoPaziente onPazienteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
+              </div>
+            )}
 
-          {sezione === "medici" && (
-            <div>
-              <ListaMedici aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
-              {ruolo === "Admin" && <NuovoMedico onMedicoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
-            </div>
-          )}
+            {sezione === "medici" && (
+              <div>
+                <ListaMedici aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
+                {ruolo === "Admin" && <NuovoMedico onMedicoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
+              </div>
+            )}
 
-          {sezione === "appuntamenti" && (
-            <div>
-              <ListaAppuntamenti aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
-              {(ruolo === "Admin" || ruolo === "Segreteria") && <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
-            </div>
-          )}
+            {sezione === "appuntamenti" && (
+              <div>
+                <ListaAppuntamenti aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
+                {(ruolo === "Admin" || ruolo === "Segreteria") && <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
+              </div>
+            )}
 
-          {sezione === "utenti" && ruolo === "Admin" && (
-            <div>
-              <ListaUtenti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
-              <NuovoUtente onUtenteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
-            </div>
-          )}
-
-          <button onClick={eseguiLogout}>Logout</button>
+            {sezione === "utenti" && ruolo === "Admin" && (
+              <div>
+                <ListaUtenti aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
+                <NuovoUtente onUtenteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <Login onLoginRiuscito={gestioneLogin} />

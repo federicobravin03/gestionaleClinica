@@ -1,11 +1,15 @@
 import { useState } from "react";
+import "./Login.css";
 
 function Login({ onLoginRiuscito }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [messaggio, setMessaggio] = useState("");
+    const [caricamento, setCariamento] = useState(false);
 
     const eseguiLogin = async () => {
+        setCariamento(true);
+
         const risposta = await fetch("http://localhost:8000/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -20,26 +24,41 @@ function Login({ onLoginRiuscito }) {
         } else {
             setMessaggio("Credenziali non valide");
         }
+
+        setCariamento(false);
     }
 
     return (
-        <div>
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
+        <div className="login-pagina">
+        <div className="login-scheda">
+            <h1 className="login-titolo">Gestionale Poliambulatorio</h1>
+            <p className="login-sottotitolo">Accedi per gestire agende e pazienti</p>
 
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="campo">
+                <label>Nome utente</label>
+                <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    onKeyDown={(e) => {if(e.key === "Enter") eseguiLogin();}}
+                />
+            </div>
 
-            <button onClick={eseguiLogin}>Accedi</button>
-            
-            <p>{messaggio}</p>
+            <div className="campo">
+                <label>Password</label>
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => {if(e.key === "Enter") eseguiLogin();}}
+                />
+            </div>
+
+            <button className="bottone-primario" onClick={eseguiLogin} disabled={caricamento}>Accedi</button>
+
+            {messaggio && <p className="messaggio-errore">{messaggio}</p>}
         </div>
+    </div>
     )
 }
 
