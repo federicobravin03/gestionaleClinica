@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ListaMedici({aggiornamento, onSessioneScaduta}) {
+function ListaMedici({aggiornamento, ruolo, onSessioneScaduta}) {
     const [medici, setMedici] = useState([]);
     const [messaggio, setMessaggio] = useState("");
 
@@ -57,7 +57,7 @@ function ListaMedici({aggiornamento, onSessioneScaduta}) {
                 {medici.map((medico) => (
                     <li key={medico.id}>
                         {medico.utente.nome} {medico.utente.cognome} - {medico.specializzazione} (Numero albo: {medico.numeroAlbo})
-                        <button onClick={() => eliminaMedico(medico.id)}>Elimina</button>
+                        {ruolo === "Admin" && <button onClick={() => eliminaMedico(medico.id)}>Elimina</button>}
                     </li>
                 ))}
             </ul>

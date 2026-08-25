@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ListaPazienti({ aggiornamento, onSessioneScaduta}) {
+function ListaPazienti({ aggiornamento, ruolo, onSessioneScaduta}) {
     const [pazienti, setPazienti] = useState([]);
     const [messaggio, setMessaggio] = useState("");
     const [inModifica, setInModifica] = useState(null);
@@ -107,12 +107,13 @@ function ListaPazienti({ aggiornamento, onSessioneScaduta}) {
                                 <button onClick={() => setInModifica(null)}>Annulla</button>
                             </span>
                         ) : (
-                            <span>
-                                <button onClick={() => eliminaPaziente(paziente.id)}>Elimina</button>
-                                <button onClick={() => setInModifica(paziente)}>Modifica</button>
-                            </span>    
+                            (ruolo === "Admin" || ruolo === "Segreteria") && (
+                                <span>
+                                    <button onClick={() => eliminaPaziente(paziente.id)}>Elimina</button>
+                                    <button onClick={() => setInModifica(paziente)}>Modifica</button>
+                                </span>
+                            ) 
                         )}
-
                     </li>
                 ))}
             </ul>

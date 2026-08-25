@@ -7,6 +7,7 @@ from sqlalchemy import select
 from fastapi import HTTPException
 from auth import pwd_context
 from datetime import datetime
+from datetime import timedelta
 from email_service import emailConferma
 import unicodedata
 
@@ -356,6 +357,9 @@ class AppuntamentoServices:
         
         if appuntamento.stato != StatoAppuntamento.PROGRAMMATO:
             raise HTTPException(status_code=409, detail="L'appuntamento non può essere iniziato")
+        
+        if appuntamento.dataOra - timedelta(minutes=15) > datetime.now():
+            raise HTTPException(status_code=409, detail="L'appuntamento non può essere iniziato prima dell'orario previsto")
         
         appuntamento.stato = StatoAppuntamento.INCORSO
 

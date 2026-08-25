@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
+function ListaAppuntamenti({ aggiornamento, ruolo, onSessioneScaduta }) {
     const [appuntamenti, setAppuntamenti] = useState([]);
     const [pazienti, setPazienti] = useState([]);
     const [medici, setMedici] = useState([]);
+    const [filtro, setFiltro] = useState("Tutti");
     const [messaggio, setMessaggio] = useState("");
     const [inConclusione, setInConclusione] = useState(null);
     const [datiConclusione, setDatiConclusione] = useState({prezzo: "", esito: ""});
@@ -24,7 +25,8 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
         } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
-            setMessaggio("Errore durante il caricamento");
+            const risultato = await risposta.json();
+            setMessaggio("Errore: " + risultato.detail);
         }
     }
 
@@ -44,7 +46,8 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
         } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
-            setMessaggio("Errore durante il caricamento");
+            const risultato = await risposta.json();
+            setMessaggio("Errore: " + risultato.detail);
         }
     }
 
@@ -64,7 +67,8 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
         } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
-            setMessaggio("Errore durante il caricamento");
+            const risultato = await risposta.json();
+            setMessaggio("Errore: " + risultato.detail);
         }
     }
 
@@ -87,7 +91,8 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
         } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
-            setMessaggio("Errore durante l'annullamento");
+            const risultato = await risposta.json();
+            setMessaggio("Errore: " + risultato.detail);
         }
     }
 
@@ -106,7 +111,8 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
         } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
-            setMessaggio("Errore durante l'inizializzazione dell'appuntamento");
+            const risultato = await risposta.json();
+            setMessaggio("Errore: " + risultato.detail);
         }
     }
 
@@ -140,7 +146,8 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
         } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
-            setMessaggio("Errore durante la conclusione dell'appuntamento");
+            const risultato = await risposta.json();
+            setMessaggio("Errore: " + risultato.detail);
         }
     }
 
@@ -156,15 +163,25 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
 
     return (
         <div>
+            <div>
+                <button onClick={() => setFiltro("Tutti")} disabled={filtro === "Tutti"}>Tutti</button>
+                <button onClick={() => setFiltro("Programmato")} disabled={filtro === "Programmato"}>Programmato</button>
+                <button onClick={() => setFiltro("In corso")} disabled={filtro === "In corso"}>In corso</button>
+                <button onClick={() => setFiltro("Concluso")} disabled={filtro === "Concluso"}>Concluso</button>
+                <button onClick={() => setFiltro("Annullato")} disabled={filtro === "Annullato"}>Annullato</button>
+            </div>
             <ul>
-                {appuntamenti.map((appuntamento) => (
+                {appuntamenti.filter((a) => filtro === "Tutti" || a.stato === filtro).map((appuntamento) => (
                     <li key={appuntamento.id}>
                         {new Date(appuntamento.dataOra).toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         - Stato: {appuntamento.stato} - Paziente: {nomePaziente(appuntamento.paziente_id)} - Medico: {nomeMedico(appuntamento.medico_id)}
+                        {appuntamento.stato === "Concluso" && (
+                            <span>- Prezzo: €{appuntamento.prezzo} - Esito: {appuntamento.esito}</span>
+                        )}
                         {appuntamento.stato === "Programmato" && (
                             <span>
-                                <button onClick={() => iniziaAppuntamento(appuntamento.id)}>Inizia</button>
-                                <button onClick={() => annullaAppuntamento(appuntamento.id)}>Annulla</button>
+                                {(ruolo === "Admin" || ruolo === "Medico") && <button onClick={() => iniziaAppuntamento(appuntamento.id)}>Inizia</button>}
+                                {(ruolo === "Admin" || ruolo === "Segreteria") && <button onClick={() => annullaAppuntamento(appuntamento.id)}>Annulla</button>}
                             </span>
                         )}
                         {appuntamento.stato === "In corso" && (
@@ -176,7 +193,7 @@ function ListaAppuntamenti({ aggiornamento, onSessioneScaduta }) {
                                     <button onClick={() => setInConclusione(null)}>Annulla</button>
                                 </span>
                             ) : (
-                                <button onClick={() => {setInConclusione(appuntamento), setDatiConclusione({prezzo: "", esito: ""})}}>Concludi</button>
+                                (ruolo === "Admin" || ruolo === "Medico") && <button onClick={() => {setInConclusione(appuntamento), setDatiConclusione({prezzo: "", esito: ""})}}>Concludi</button>
                             )
                         )}
                     </li>

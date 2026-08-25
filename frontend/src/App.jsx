@@ -9,19 +9,31 @@ import NuovoMedico from "./components/NuovoMedico";
 import ListaUtenti from "./components/ListaUtenti";
 import NuovoUtente from "./components/NuovoUtente";
 
+const leggiRuolo = () => {
+  const token = localStorage.getItem("token");
+  if(!token) return null;
+
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  return payload.ruolo;
+}
+
 function App() {
   const [autenticato, setAutenticato] = useState(localStorage.getItem("token") !== null);
   const [aggiornamento, setAggiornamento] = useState(0);
   const [sezione, setSezione] = useState("pazienti");
   const [messaggio, setMessaggio] = useState("");
+  const [ruolo, setRuolo] = useState(leggiRuolo());
 
   const eseguiLogout = () => {
     localStorage.removeItem("token");
     setAutenticato(false);
+    setRuolo(null);
+    setSezione("pazienti");
   }
 
   const gestioneLogin = () => {
     setAutenticato(true);
+    setRuolo(leggiRuolo());
   }
 
   const gestionePazienteCreato = () => {
@@ -32,6 +44,8 @@ function App() {
     localStorage.removeItem("token");
     setAutenticato(false);
     setMessaggio("Sessione scaduta, effettuare nuovamente il login");
+    setSezione("pazienti");
+    setRuolo(null);
   }
 
   return (
@@ -44,31 +58,33 @@ function App() {
             <button onClick={() => setSezione("pazienti")} disabled={sezione === "pazienti"}>Pazienti</button>
             <button onClick={() => setSezione("medici")} disabled={sezione === "medici"}>Medici</button>
             <button onClick={() => setSezione("appuntamenti")} disabled={sezione === "appuntamenti"}>Appuntamenti</button>
-            <button onClick={() => setSezione("utenti")} disabled={sezione === "utenti"}>Utenti</button>
+            {ruolo === "Admin" && (
+              <button onClick={() => setSezione("utenti")} disabled={sezione === "utenti"}>Utenti</button>
+            )}
           </nav>
 
           {sezione === "pazienti" && (
             <div>
-              <ListaPazienti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
-              <NuovoPaziente onPazienteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
+              <ListaPazienti aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
+              {(ruolo === "Admin" || ruolo === "Segreteria") && <NuovoPaziente onPazienteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
             </div>
           )}
 
           {sezione === "medici" && (
             <div>
-              <ListaMedici aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
-              <NuovoMedico onMedicoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
+              <ListaMedici aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
+              {ruolo === "Admin" && <NuovoMedico onMedicoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
             </div>
           )}
 
           {sezione === "appuntamenti" && (
             <div>
-              <ListaAppuntamenti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
-              <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
+              <ListaAppuntamenti aggiornamento={aggiornamento} ruolo={ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
+              {(ruolo === "Admin" || ruolo === "Segreteria") && <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
             </div>
           )}
 
-          {sezione == "utenti" && (
+          {sezione === "utenti" && ruolo === "Admin" && (
             <div>
               <ListaUtenti aggiornamento={aggiornamento} onSessioneScaduta={gestioneSessioneScaduta} />
               <NuovoUtente onUtenteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
