@@ -192,6 +192,6 @@ async def login(dati: Login, db: Session = Depends(get_db)):
     if not passwordVerificata:
         raise HTTPException(status_code=401, detail="Credenziali non valide")
     
-    token = creaToken(utente.id, utente.ruolo.value)
+    token = creaToken(utente.id, utente.ruolo.value, utente.nome, utente.cognome)
 
     return {"access_token": token, "token_type": "bearer"}

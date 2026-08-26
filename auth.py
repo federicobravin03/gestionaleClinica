@@ -18,12 +18,14 @@ security = HTTPBearer()
 def verificaPassword(password, passwordHash):
     return pwd_context.verify(password, passwordHash)
 
-def creaToken(utente, ruolo):
+def creaToken(utente, ruolo, nome, cognome):
     scadenza = datetime.now(timezone.utc) + timedelta(minutes=DURATA_TOKEN)
 
     dizionario = {
         "sub": str(utente),
         "ruolo": ruolo,
+        "nome": nome,
+        "cognome": cognome,
         "exp": scadenza
     }
 

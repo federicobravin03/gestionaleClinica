@@ -1,20 +1,23 @@
-.app {
+.app-layout {
+  display: flex;
   min-height: 100vh;
 }
 
-.barra-superiore {
+.barra-laterale {
+  width: 240px;
+  flex-shrink: 0;
   background: var(--superficie);
-  border-bottom: 1px solid var(--bordo);
-  padding: var(--sp-4) var(--sp-6);
+  border-right: 1px solid var(--bordo);
+  padding: var(--sp-5) var(--sp-4);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--sp-1);
 }
 
-.barra-titolo {
-  font-size: 27px;
-  font-weight: 600;
-  color: var(--testo);
+.area-principale {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .bottone-esci {
@@ -34,40 +37,73 @@
   color: var(--errore);
 }
 
-.navigazione {
-  background: var(--superficie);
-  border-bottom: 1px solid var(--bordo);
-  padding: 0 var(--sp-6);
-  display: flex;
-  justify-content: center;
-  gap: var(--sp-2);
-}
-
 .nav-voce {
   background: none;
   border: none;
-  padding: var(--sp-4) var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--raggio-m);
   font-size: 15px;
   font-family: inherit;
   color: var(--testo-tenue);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.nav-voce:hover:not(:disabled) {
-  color: var(--testo);
-}
-
-.nav-voce:disabled {
-  color: var(--accento);
-  border-bottom-color: var(--accento);
-  font-weight: 500;
-  cursor: default;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
 }
 
 .contenuto {
   max-width: 1000px;
   margin: 0 auto;
   padding: var(--sp-6);
+}
+
+.barra-destra {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.barra-utente {
+  font-size: 14px;
+  color: var(--testo-tenue);
+}
+
+.intestazione {
+  background: var(--superficie);
+  border-bottom: 1px solid var(--bordo);
+  padding: var(--sp-4) var(--sp-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.titolo-sezione {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--testo);
+}
+
+.barra-titolo {
+  font-size: 23px;
+  font-weight: 600;
+  padding: var(--sp-3) var(--sp-3);
+  margin-bottom: var(--sp-4);
+  display: block;
+}
+
+.navigazione {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.nav-voce:hover:not(:disabled) {
+  background: var(--sfondo);
+  color: var(--testo);
+}
+
+.nav-voce:disabled {
+  background: var(--accento-tenue);
+  color: var(--accento);
+  font-weight: 500;
+  cursor: default;
 }
