@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import "./App.css";
 import Login from "./components/Login";
 import ListaPazienti from "./components/ListaPazienti";
@@ -22,6 +22,7 @@ function App() {
   const [aggiornamento, setAggiornamento] = useState(0);
   const [sezione, setSezione] = useState("pazienti");
   const [messaggio, setMessaggio] = useState("");
+  const [mostraForm, setMostraForm] = useState(false);
   const [utente, setUtente] = useState(leggiUtente());
   const titoloSezione = {
     pazienti: "Pazienti",
@@ -44,6 +45,7 @@ function App() {
 
   const gestionePazienteCreato = () => {
     setAggiornamento(aggiornamento + 1);
+    setMostraForm(false);
   }
 
   const gestioneSessioneScaduta = () => {
@@ -84,8 +86,19 @@ function App() {
             <div className="contenuto">
               {sezione === "pazienti" && (
                 <div>
+                  {(utente?.ruolo === "Admin" || utente?.ruolo === "Segreteria") && (
+                    <div className="barra-azioni">
+                      <button className="bottone-primario bottone-compatto" onClick={() => setMostraForm(!mostraForm)}>
+                        {mostraForm ? "Annulla" : "+ Nuovo paziente"}
+                      </button>
+                    </div>
+                  )}
+
+                  {mostraForm && (
+                    <NuovoPaziente onPazienteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} onChiudi={() => setMostraForm(false)} />
+                  )}
+
                   <ListaPazienti aggiornamento={aggiornamento} ruolo={utente?.ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
-                  {(utente?.ruolo === "Admin" || utente?.ruolo === "Segreteria") && <NuovoPaziente onPazienteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
                 </div>
               )}
 
@@ -110,7 +123,7 @@ function App() {
                 </div>
               )}
             </div>
-          </div>  
+          </div>
         </div>
       ) : (
         <Login onLoginRiuscito={gestioneLogin} />
