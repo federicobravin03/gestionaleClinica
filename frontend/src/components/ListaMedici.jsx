@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ListaMedici({aggiornamento, ruolo, onSessioneScaduta}) {
+function ListaMedici({ aggiornamento, ruolo, onSessioneScaduta }) {
     const [medici, setMedici] = useState([]);
     const [messaggio, setMessaggio] = useState("");
 
@@ -15,9 +15,9 @@ function ListaMedici({aggiornamento, ruolo, onSessioneScaduta}) {
 
         const dati = await risposta.json();
 
-        if(risposta.ok) {
+        if (risposta.ok) {
             setMedici(dati);
-        } else if(risposta.status === 401) {
+        } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
             setMessaggio("Errore durante il caricamento");
@@ -27,7 +27,7 @@ function ListaMedici({aggiornamento, ruolo, onSessioneScaduta}) {
     const eliminaMedico = async (id) => {
         const token = localStorage.getItem("token");
 
-        if(!confirm("Eliminare il medico?")) {
+        if (!confirm("Eliminare il medico?")) {
             return;
         }
 
@@ -38,9 +38,9 @@ function ListaMedici({aggiornamento, ruolo, onSessioneScaduta}) {
             }
         });
 
-        if(risposta.ok) {
+        if (risposta.ok) {
             caricaMedici();
-        } else if(risposta.status === 401) {
+        } else if (risposta.status === 401) {
             onSessioneScaduta();
         } else {
             setMessaggio("Errore durante l'eliminazione");
@@ -51,19 +51,35 @@ function ListaMedici({aggiornamento, ruolo, onSessioneScaduta}) {
         caricaMedici();
     }, [aggiornamento])
 
-    return(
-        <div>
-            <ul>
-                {medici.map((medico) => (
-                    <li key={medico.id}>
-                        {medico.utente.nome} {medico.utente.cognome} - {medico.specializzazione} (Numero albo: {medico.numeroAlbo})
-                        {ruolo === "Admin" && <button onClick={() => eliminaMedico(medico.id)}>Elimina</button>}
-                    </li>
-                ))}
-            </ul>
-            <p>{messaggio}</p>
+    return (
+        <div className="scheda">
+            <h2 className="scheda-titolo">Elenco medici</h2>
+
+            {medici.length === 0 ? (
+                <p className="lista-vuota">Nessun medico registrato</p>
+            ) : (
+                <ul className="lista">
+                    {medici.map((medico) => (
+                        <li key={medico.id} className="lista-riga">
+                            <div className="riga-info">
+                                <span className="riga-principale">{medico.utente.nome} {medico.utente.cognome}</span>
+                                <span className="riga-secondaria">{medico.specializzazione}</span>
+                                <span className="riga-secondaria">Albo n. {medico.numeroAlbo}</span>
+                            </div>
+
+                            {ruolo === "Admin" && (
+                                <div className="riga-azioni">
+                                    <button className="bottone-secondario bottone-pericolo" onClick={() => eliminaMedico(medico.id)}>Elimina</button>
+                                </div>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {messaggio && <p className="messaggio messaggio-errore">{messaggio}</p>}
         </div>
     )
-} 
+}
 
 export default ListaMedici;

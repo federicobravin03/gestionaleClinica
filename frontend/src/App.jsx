@@ -1,4 +1,4 @@
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import Login from "./components/Login";
 import ListaPazienti from "./components/ListaPazienti";
@@ -71,6 +71,9 @@ function App() {
                 <button className="nav-voce" onClick={() => setSezione("utenti")} disabled={sezione === "utenti"}>Utenti</button>
               )}
             </nav>
+            <div className="barra-piede">
+              {new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            </div>
           </aside>
 
           <div className="area-principale">
@@ -104,22 +107,63 @@ function App() {
 
               {sezione === "medici" && (
                 <div>
+                  {utente?.ruolo === "Admin" && (
+                    <div className="barra-azioni">
+                      <button className="bottone-primario bottone-compatto" onClick={() => setMostraForm(!mostraForm)}>
+                        {mostraForm ? "Annulla" : "+ Nuovo medico"}
+                      </button>
+                    </div>
+                  )}
+
+                  {mostraForm && (
+                    <NuovoMedico
+                      onMedicoCreato={gestionePazienteCreato}
+                      onSessioneScaduta={gestioneSessioneScaduta}
+                      onChiudi={() => setMostraForm(false)}
+                    />
+                  )}
                   <ListaMedici aggiornamento={aggiornamento} ruolo={utente?.ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
-                  {utente?.ruolo === "Admin" && <NuovoMedico onMedicoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
                 </div>
               )}
 
               {sezione === "appuntamenti" && (
                 <div>
+                  {(utente?.ruolo === "Admin" || utente?.ruolo === "Segreteria") && (
+                    <div className="barra-azioni">
+                      <button className="bottone-primario bottone-compatto" onClick={() => setMostraForm(!mostraForm)}>
+                        {mostraForm ? "Annulla" : "+ Nuovo appuntamento"}
+                      </button>
+                    </div>
+                  )}
+
+                  {mostraForm && (
+                    <NuovoAppuntamento
+                      onAppuntamentoCreato={gestionePazienteCreato}
+                      onSessioneScaduta={gestioneSessioneScaduta}
+                      onChiudi={() => setMostraForm(false)}
+                    />
+                  )}
+
                   <ListaAppuntamenti aggiornamento={aggiornamento} ruolo={utente?.ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
-                  {(utente?.ruolo === "Admin" || utente?.ruolo === "Segreteria") && <NuovoAppuntamento onAppuntamentoCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />}
                 </div>
               )}
 
               {sezione === "utenti" && utente?.ruolo === "Admin" && (
                 <div>
+                  <div className="barra-azioni">
+                    <button className="bottone-primario bottone-compatto" onClick={() => setMostraForm(!mostraForm)}>
+                      {mostraForm ? "Annulla" : "+ Nuovo utente"}
+                    </button>
+                  </div>
+
+                  {mostraForm && (
+                    <NuovoUtente
+                      onUtenteCreato={gestionePazienteCreato}
+                      onSessioneScaduta={gestioneSessioneScaduta}
+                      onChiudi={() => setMostraForm(false)}
+                    />
+                  )}
                   <ListaUtenti aggiornamento={aggiornamento} ruolo={utente?.ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
-                  <NuovoUtente onUtenteCreato={gestionePazienteCreato} onSessioneScaduta={gestioneSessioneScaduta} />
                 </div>
               )}
             </div>

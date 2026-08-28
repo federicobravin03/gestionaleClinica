@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 
-function NuovoMedico({ onMedicoCreato, onSessioneScaduta }) {
+function NuovoMedico({ onMedicoCreato, onSessioneScaduta, onChiudi }) {
     const [messaggio, setMessaggio] = useState("");
     const [utenti, setUtenti] = useState([]);
     const [dati, setDati] = useState({
@@ -71,30 +71,41 @@ function NuovoMedico({ onMedicoCreato, onSessioneScaduta }) {
     }, [])
 
     return (
-        <div>
-            <select value={dati.utente_id} onChange={(e) => aggiornaCampo("utente_id", e.target.value)}>
-                <option value="">Seleziona utente</option>
-                {utenti.filter((u) => u.ruolo === "Medico").map((utente) => (
-                    <option key={utente.id} value={utente.id}>
-                        {utente.nome} {utente.cognome}
-                    </option>
-                ))}
-            </select>
-            <input
-                type="text"
-                placeholder="Numero albo"
-                value={dati.numeroAlbo}
-                onChange={(e) => aggiornaCampo("numeroAlbo", e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Specializzazione"
-                value={dati.specializzazione}
-                onChange={(e) => aggiornaCampo("specializzazione", e.target.value)}
-            />
+        <div className="velo">
+            <div className="modale">
+                <div className="modale-intestazione">
+                    <h2 className="scheda-titolo">Nuovo medico</h2>
+                    <button className="chiudi-modale" onClick={onChiudi}>×</button>
+                </div>
 
-            <button onClick={creaMedico}>Crea medico</button>
-            <p>{messaggio}</p>
+                <div className="form-griglia">
+                    <div className="campo">
+                        <label>Utente</label>
+                        <select value={dati.utente_id} onChange={(e) => aggiornaCampo("utente_id", e.target.value)}>
+                            <option value="">Seleziona utente</option>
+                            {utenti.filter((u) => u.ruolo === "Medico").map((utente) => (
+                                <option key={utente.id} value={utente.id}>
+                                    {utente.nome} {utente.cognome}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="campo">
+                        <label>Numero albo</label>
+                        <input type="text" value={dati.numeroAlbo} onChange={(e) => aggiornaCampo("numeroAlbo", e.target.value)} />
+                    </div>
+
+                    <div className="campo campo-intero">
+                        <label>Specializzazione</label>
+                        <input type="text" value={dati.specializzazione} onChange={(e) => aggiornaCampo("specializzazione", e.target.value)} />
+                    </div>
+                </div>
+
+                <button className="bottone-primario" onClick={creaMedico}>Crea medico</button>
+
+                {messaggio && <p className="messaggio messaggio-errore">{messaggio}</p>}
+            </div>
         </div>
     )
 }

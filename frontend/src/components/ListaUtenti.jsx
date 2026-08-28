@@ -15,7 +15,7 @@ function ListaUtenti({ aggiornamento, onSessioneScaduta }) {
 
         const dati = await risposta.json();
 
-        if(risposta.ok) {
+        if (risposta.ok) {
             setUtenti(dati);
         } else if (risposta.status === 401) {
             onSessioneScaduta();
@@ -27,7 +27,7 @@ function ListaUtenti({ aggiornamento, onSessioneScaduta }) {
     const eliminaUtente = async (id) => {
         const token = localStorage.getItem("token");
 
-        if(!confirm("Eliminare utente?")) {
+        if (!confirm("Eliminare utente?")) {
             return;
         }
 
@@ -38,7 +38,7 @@ function ListaUtenti({ aggiornamento, onSessioneScaduta }) {
             }
         });
 
-        if(risposta.ok) {
+        if (risposta.ok) {
             caricaUtenti();
         } else if (risposta.status === 401) {
             onSessioneScaduta();
@@ -51,17 +51,31 @@ function ListaUtenti({ aggiornamento, onSessioneScaduta }) {
         caricaUtenti();
     }, [aggiornamento])
 
-    return(
-        <div>
-            <ul>
-                {utenti.map((utente) => (
-                    <li key={utente.id}>
-                        {utente.nome} {utente.cognome} - {utente.ruolo} - username: {utente.username} - {utente.email}
-                        <button onClick={() => eliminaUtente(utente.id)}>Elimina</button>
-                    </li>
-                ))}
-            </ul>
-            <p>{messaggio}</p>
+    return (
+        <div className="scheda">
+            <h2 className="scheda-titolo">Elenco utenti</h2>
+
+            {utenti.length === 0 ? (
+                <p className="lista-vuota">Nessun utente registrato</p>
+            ) : (
+                <ul className="lista">
+                    {utenti.map((u) => (
+                        <li key={u.id} className="lista-riga">
+                            <div className="riga-info">
+                                <span className="riga-principale">{u.nome} {u.cognome}</span>
+                                <span className="riga-secondaria">{u.ruolo}</span>
+                                <span className="riga-secondaria">{u.username}</span>
+                            </div>
+
+                            <div className="riga-azioni">
+                                <button className="bottone-secondario bottone-pericolo" onClick={() => eliminaUtente(u.id)}>Elimina</button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {messaggio && <p className="messaggio messaggio-errore">{messaggio}</p>}
         </div>
     )
 }

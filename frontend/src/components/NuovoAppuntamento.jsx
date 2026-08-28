@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta }) {
+function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }) {
     const [pazienti, setPazienti] = useState([]);
     const [medici, setMedici] = useState([]);
     const [messaggio, setMessaggio] = useState("");
@@ -15,7 +15,7 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta }) {
     }
 
     const creaAppuntamento = async () => {
-        if(dati.dataOra === "" || dati.paziente_id === "" || dati.medico_id === "") {
+        if (dati.dataOra === "" || dati.paziente_id === "" || dati.medico_id === "") {
             setMessaggio("Compilare tutti i campi");
             return;
         }
@@ -94,32 +94,44 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta }) {
     }, [])
 
     return (
-        <div>
-            <input type="datetime-local" min={new Date().toISOString().slice(0, 16)} value={dati.dataOra} onChange={(e) => aggiornaCampo("dataOra", e.target.value)} />
+        <div className="velo">
+            <div className="modale">
+                <div className="modale-intestazione">
+                    <h2 className="scheda-titolo">Nuovo appuntamento</h2>
+                    <button className="chiudi-modale" onClick={onChiudi}>×</button>
+                </div>
 
-            <select value={dati.paziente_id} onChange={(e) => aggiornaCampo("paziente_id", e.target.value)}>
-                <option value="">Seleziona paziente</option>
+                <div className="form-griglia">
+                    <div className="campo campo-intero">
+                        <label>Paziente</label>
+                        <select value={dati.paziente_id} onChange={(e) => aggiornaCampo("paziente_id", e.target.value)}>
+                            <option value="">Seleziona paziente</option>
+                            {pazienti.map((paziente) => (
+                                <option key={paziente.id} value={paziente.id}>{paziente.nome} {paziente.cognome}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                {pazienti.map((paziente) => (
-                    <option key={paziente.id} value={paziente.id}>
-                        {paziente.nome} {paziente.cognome}
-                    </option>
-                ))}
-            </select>
+                    <div className="campo campo-intero">
+                        <label>Medico</label>
+                        <select value={dati.medico_id} onChange={(e) => aggiornaCampo("medico_id", e.target.value)}>
+                            <option value="">Seleziona medico</option>
+                            {medici.map((medico) => (
+                                <option key={medico.id} value={medico.id}>{medico.utente.nome} {medico.utente.cognome} — {medico.specializzazione}</option>
+                            ))}
+                        </select>
+                    </div>
 
-            <select value={dati.medico_id} onChange={(e) => aggiornaCampo("medico_id", e.target.value)}>
-                <option value="">Seleziona medico</option>
+                    <div className="campo campo-intero">
+                        <label>Data e ora</label>
+                        <input type="datetime-local" min={new Date().toISOString().slice(0, 16)} value={dati.dataOra} onChange={(e) => aggiornaCampo("dataOra", e.target.value)} />
+                    </div>
+                </div>
 
-                {medici.map((medico) => (
-                    <option key={medico.id} value={medico.id}>
-                        {medico.utente.nome} {medico.utente.cognome} - {medico.specializzazione}
-                    </option>
-                ))}
-            </select>
+                <button className="bottone-primario" onClick={creaAppuntamento}>Crea appuntamento</button>
 
-            <button onClick={creaAppuntamento}>Crea appuntamento</button>
-
-            <p>{messaggio}</p>
+                {messaggio && <p className="messaggio messaggio-errore">{messaggio}</p>}
+            </div>
         </div>
     )
 }
