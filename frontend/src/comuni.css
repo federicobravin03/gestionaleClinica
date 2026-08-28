@@ -345,3 +345,18 @@
   font-size: 13px;
   color: var(--testo-tenue);
 }
+
+.contenitore-grafico {
+  height: 300px;
+  position: relative;
+}
+
+.scheda-distanziata {
+  margin-top: var(--sp-6);
+}
+
+.griglia-grafici {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-5);
+}
