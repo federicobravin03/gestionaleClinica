@@ -9,6 +9,7 @@ import ListaMedici from "./components/ListaMedici";
 import NuovoMedico from "./components/NuovoMedico";
 import ListaUtenti from "./components/ListaUtenti";
 import NuovoUtente from "./components/NuovoUtente";
+import Dashboard from "./components/Dashboard";
 
 const leggiUtente = () => {
   const token = localStorage.getItem("token");
@@ -69,6 +70,9 @@ function App() {
               <button className="nav-voce" onClick={() => setSezione("appuntamenti")} disabled={sezione === "appuntamenti"}>Appuntamenti</button>
               {utente?.ruolo === "Admin" && (
                 <button className="nav-voce" onClick={() => setSezione("utenti")} disabled={sezione === "utenti"}>Utenti</button>
+              )}
+              {utente?.ruolo === "Admin" && (
+                <button className="nav-voce" onClick={() => setSezione("dashboard")} disabled={sezione === "dashboard"}>Dashboard</button>
               )}
             </nav>
             <div className="barra-piede">
@@ -165,6 +169,10 @@ function App() {
                   )}
                   <ListaUtenti aggiornamento={aggiornamento} ruolo={utente?.ruolo} onSessioneScaduta={gestioneSessioneScaduta} />
                 </div>
+              )}
+
+              {sezione === "dashboard" && utente?.ruolo === "Admin" && (
+                <Dashboard onSessioneScaduta={gestioneSessioneScaduta} />
               )}
             </div>
           </div>
