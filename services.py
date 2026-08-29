@@ -279,6 +279,15 @@ class AppuntamentoServices:
         if dati.dataOra < datetime.now():
             raise HTTPException(status_code=400, detail="Non è possibile prenotare un appuntamento nel passato")
         
+        if dati.dataOra.weekday() >= 5:
+            raise HTTPException(status_code=400, detail="La struttura è chiusa nel fine settimana")
+        
+        if dati.dataOra.minute != 0:
+            raise HTTPException(status_code=400, detail="Gli appuntamenti sono programmabili solo a ore intere")
+
+        if dati.dataOra.hour < 9 or dati.dataOra.hour > 18:
+            raise HTTPException(status_code=400, detail="Orario non compreso nell'apertura della struttura (9:00-19:00)")
+        
         occupato = self.cercaMedicoEOra(dati.medico_id, dati.dataOra)
         if occupato is not None:
             raise HTTPException(status_code=409, detail="Il medico ha già un appuntamento in questo orario")

@@ -116,7 +116,7 @@
 }
 
 .barra-piede {
-  margin-top: auto;
+  /*margin-top: auto;*/
   border-top: 1px solid var(--bordo);
   padding: 0 var(--sp-4);
   height: 60px;
@@ -127,4 +127,32 @@
   text-transform: capitalize;
   justify-content: center;
   padding-right: 26px;
+}
+
+.riepilogo-barra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  margin-top: auto;
+  padding-left: 25px;
+}
+
+.riepilogo-voce {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+.riepilogo-numero {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accento);
+  min-width: 24px;
+  text-align: center;
+}
+
+.riepilogo-etichetta {
+  font-size: 13px;
+  color: var(--testo-tenue);
 }

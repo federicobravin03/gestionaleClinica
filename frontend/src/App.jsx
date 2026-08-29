@@ -10,6 +10,7 @@ import NuovoMedico from "./components/NuovoMedico";
 import ListaUtenti from "./components/ListaUtenti";
 import NuovoUtente from "./components/NuovoUtente";
 import Dashboard from "./components/Dashboard";
+import RiepilogoBarra from "./components/RiepilogoBarra";
 
 const leggiUtente = () => {
   const token = localStorage.getItem("token");
@@ -75,6 +76,9 @@ function App() {
                 <button className="nav-voce" onClick={() => setSezione("dashboard")} disabled={sezione === "dashboard"}>Dashboard</button>
               )}
             </nav>
+
+              <RiepilogoBarra onSessioneScaduta={gestioneSessioneScaduta} />
+
             <div className="barra-piede">
               {new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </div>

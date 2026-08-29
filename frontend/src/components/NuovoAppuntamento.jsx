@@ -5,7 +5,8 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }
     const [medici, setMedici] = useState([]);
     const [messaggio, setMessaggio] = useState("");
     const [dati, setDati] = useState({
-        dataOra: "",
+        data: "",
+        ora: "",
         paziente_id: "",
         medico_id: ""
     });
@@ -15,9 +16,15 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }
     }
 
     const creaAppuntamento = async () => {
-        if (dati.dataOra === "" || dati.paziente_id === "" || dati.medico_id === "") {
+        if (dati.data === "" || dati.ora === "" || dati.paziente_id === "" || dati.medico_id === "") {
             setMessaggio("Compilare tutti i campi");
             return;
+        }
+
+        const daInviare = {
+            dataOra: `${dati.data}T${dati.ora}:00`,
+            paziente_id: dati.paziente_id,
+            medico_id: dati.medico_id
         }
 
         const token = localStorage.getItem("token");
@@ -29,12 +36,13 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }
                 "Authorization": `Bearer ${token}`
             },
 
-            body: JSON.stringify(dati)
+            body: JSON.stringify(daInviare)
         });
 
         if (risposta.ok) {
             setDati({
-                dataOra: "",
+                data: "",
+                ora: "",
                 paziente_id: "",
                 medico_id: ""
             })
@@ -122,9 +130,17 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }
                         </select>
                     </div>
 
-                    <div className="campo campo-intero">
-                        <label>Data e ora</label>
-                        <input type="datetime-local" min={new Date().toISOString().slice(0, 16)} value={dati.dataOra} onChange={(e) => aggiornaCampo("dataOra", e.target.value)} />
+                    <div className="campo">
+                        <label>Data</label>
+                        <input type="date" min={new Date().toISOString().slice(0, 10)} value={dati.data} onChange={(e) => aggiornaCampo("data", e.target.value)} />
+                    </div>
+                    
+                    <div className="campo">
+                        <label>Orario</label>
+                        <select value={dati.ora} onChange={(e) => aggiornaCampo("ora", e.target.value)}>
+                            <option value="">Seleziona orario</option>
+                            {["09:00","10:00","11:00","12:00","14:00","15:00","16:00","17:00","18:00"].map((ora) =>(<option key={ora} value={ora}>{ora}</option>))}
+                        </select>
                     </div>
                 </div>
 
