@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }) {
     const [pazienti, setPazienti] = useState([]);
     const [medici, setMedici] = useState([]);
+    const [dataSelezionata, setDataSelezionata] = useState(null);
     const [messaggio, setMessaggio] = useState("");
     const [dati, setDati] = useState({
-        data: "",
         ora: "",
         paziente_id: "",
         medico_id: ""
@@ -16,13 +18,17 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }
     }
 
     const creaAppuntamento = async () => {
-        if (dati.data === "" || dati.ora === "" || dati.paziente_id === "" || dati.medico_id === "") {
+        if (dataSelezionata === null || dati.ora === "" || dati.paziente_id === "" || dati.medico_id === "") {
             setMessaggio("Compilare tutti i campi");
             return;
         }
+        
+        const anno = dataSelezionata.getFullYear();
+        const mese = String(dataSelezionata.getMonth() + 1).padStart(2, "0");
+        const giorno = String(dataSelezionata.getDate()).padStart(2, "0");
 
         const daInviare = {
-            dataOra: `${dati.data}T${dati.ora}:00`,
+            dataOra: `${anno}-${mese}-${giorno}T${dati.ora}:00`,
             paziente_id: dati.paziente_id,
             medico_id: dati.medico_id
         }
@@ -46,6 +52,7 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }
                 paziente_id: "",
                 medico_id: ""
             })
+            setDataSelezionata(null);
             onAppuntamentoCreato();
             setMessaggio("Appuntamento creato con successo");
         } else if (risposta.status === 401) {
@@ -132,7 +139,13 @@ function NuovoAppuntamento({ onAppuntamentoCreato, onSessioneScaduta, onChiudi }
 
                     <div className="campo">
                         <label>Data</label>
-                        <input type="date" min={new Date().toISOString().slice(0, 10)} value={dati.data} onChange={(e) => aggiornaCampo("data", e.target.value)} />
+                        <DatePicker
+                            selected={dataSelezionata}
+                            onChange={(data) => setDataSelezionata(data)}
+                            minDate={new Date()}
+                            dateFormat="dd/MM/yyyy"
+                            placeholderText="Seleziona data"
+                        />
                     </div>
                     
                     <div className="campo">

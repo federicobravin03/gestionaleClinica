@@ -1,7 +1,10 @@
 import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function NuovoPaziente({ onPazienteCreato, onSessioneScaduta, onChiudi }) {
     const [messaggio, setMessaggio] = useState("");
+    const [dataNascita, setDataNascita] = useState(null);
 
     const [dati, setDati] = useState({
         nome: "",
@@ -19,14 +22,22 @@ function NuovoPaziente({ onPazienteCreato, onSessioneScaduta, onChiudi }) {
     }
 
     const creaPaziente = async () => {
-        if (dati.nome === "" || dati.cognome === "" || dati.codiceFiscale === "" || dati.dataNascita === "" || dati.telefono === "" || dati.indirizzo === "" || dati.sesso === "") {
+        if (dati.nome === "" || dati.cognome === "" || dati.codiceFiscale === "" || dati.dataNascita === null || dati.telefono === "" || dati.indirizzo === "" || dati.sesso === "") {
             setMessaggio("Compilare tutti i campi obbligatori");
             return;
         }
 
-        const token = localStorage.getItem("token");
+        const anno = dataNascita.getFullYear();
+        const mese = String(dataNascita.getMonth() + 1).padStart(2, "0");
+        const giorno = String(dataNascita.getDate()).padStart(2, "0");
 
-        const daInviare = { ...dati, email: dati.email === "" ? null : email.dati };
+        const daInviare = {
+            ...dati,
+            dataNascita: `${anno}-${mese}-${giorno}`,
+            email: dati.email === "" ? null : dati.email
+        };
+
+        const token = localStorage.getItem("token");
 
         const risposta = await fetch("http://localhost:8000/pazienti", {
             method: "POST",
@@ -49,6 +60,7 @@ function NuovoPaziente({ onPazienteCreato, onSessioneScaduta, onChiudi }) {
                 indirizzo: "",
                 sesso: ""
             })
+            setDataNascita(null);
             onPazienteCreato();
             setMessaggio("Paziente creato con successo");
         } else if (risposta.status === 401) {
@@ -66,7 +78,7 @@ function NuovoPaziente({ onPazienteCreato, onSessioneScaduta, onChiudi }) {
                     <h2 className="scheda-titolo">Nuovo paziente</h2>
                     <button className="chiudi-modale" onClick={onChiudi}>×</button>
                 </div>
-                
+
                 <div className="form-griglia">
                     <div className="campo">
                         <label>Nome</label>
@@ -85,7 +97,15 @@ function NuovoPaziente({ onPazienteCreato, onSessioneScaduta, onChiudi }) {
 
                     <div className="campo">
                         <label>Data di nascita</label>
-                        <input type="date" value={dati.dataNascita} onChange={(e) => aggiornaCampo("dataNascita", e.target.value)} />
+                        <DatePicker
+                            selected={dataNascita}
+                            onChange={(data) => setDataNascita(data)}
+                            maxDate={new Date()}
+                            dateFormat="dd/MM/yyyy"
+                            placeholderText="Seleziona data"
+                            showYearDropdown
+                            dropdownMode="select"
+                        />
                     </div>
 
                     <div className="campo">
